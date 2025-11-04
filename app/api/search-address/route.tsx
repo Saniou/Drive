@@ -26,33 +26,22 @@ export async function GET(request: Request) {
         params.set("language", "uk,en");
         params.set("limit", "10");
         params.set("session_token", sessionToken);
+        params.set("types", "address,place,street,poi");
 
-        for (const key of new Set(Array.from(searchParams.keys()))) {
-            if (key === "q" || key === "session_token") continue;
-
-            const values = searchParams.getAll(key);
-            for (const value of values) {
-                const trimmed = value.trim();
-                if (trimmed) {
-                    params.append(key, trimmed);
-                }
+        // Дозволені проброси з клієнта (без Set/for...of)
+        const passKeys = ["country", "proximity", "bbox"];
+        for (let i = 0; i < passKeys.length; i++) {
+            const k = passKeys[i];
+            const vals = sp.getAll(k);
+            for (let j = 0; j < vals.length; j++) {
+                params.append(k, vals[j]);
             }
         }
 
-        if (!params.has("language") && DEFAULT_LANGUAGE) {
-            params.set("language", DEFAULT_LANGUAGE);
-        }
-
-        if (!params.has("limit") && DEFAULT_LIMIT) {
-            params.set("limit", DEFAULT_LIMIT);
-        }
-
-        params.set("access_token", mapboxToken);
-
-        const res = await fetch(`${BASE_URL}?${params.toString()}`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
+        const reqUrl = `${BASE_URL}?${params.toString()}&access_token=${ACCESS_TOKEN}`;
+        const res = await fetch(reqUrl, {
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
         });
 
         if (!res.ok) {
