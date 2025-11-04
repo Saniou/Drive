@@ -45,12 +45,12 @@ export async function GET(request: Request) {
         const uniqueKeys: string[] = [];
         const seenKeys = new Set<string>();
 
-        for (const key of searchParams.keys()) {
+        searchParams.forEach((_, key) => {
             if (!seenKeys.has(key)) {
                 seenKeys.add(key);
                 uniqueKeys.push(key);
             }
-        }
+        });
 
         for (const key of uniqueKeys) {
             if (key === "q" || key === "session_token") continue;
