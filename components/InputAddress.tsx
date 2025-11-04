@@ -16,7 +16,7 @@ function InputAddress() {
     const { sourceCoordinates, setSourceCoordinates } = useContext(SourceCordiContext)
     const { destinationsCoordinates, setDestinationsCoordinates } = useContext(DestinationCordiContext)
 
-    const [addressList, setAddressList] = useState<any>([])
+    const [addressList, setAddressList] = useState<any>(null)
     const [destination, setDestination] = useState<any>('')
 
     useEffect(() => {
@@ -28,18 +28,36 @@ function InputAddress() {
     }, [source, destination]);
 
     const getAddressList = async () => {
-        setAddressList([]);
+        setAddressList(null);
         const query = sourceChange ? source : destination;
 
         if (query) {
-            const res = await fetch('/api/search-address?q=' + query, {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+            try {
+                const params = new URLSearchParams({
+                    q: query,
+                    session_token
+                });
 
-            const result = await res.json();
-            setAddressList(result);
+                const res = await fetch(`/api/search-address?${params.toString()}`, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error('Failed to fetch address suggestions', res.statusText);
+                    setAddressList({ suggestions: [] });
+                    return;
+                }
+
+                const result = await res.json();
+                setAddressList(result);
+            } catch (error) {
+                console.error('Unable to fetch address suggestions', error);
+                setAddressList({ suggestions: [] });
+            }
+        } else {
+            setAddressList({ suggestions: [] });
         }
     };
 
@@ -80,7 +98,7 @@ function InputAddress() {
         <>
             <div className='flex shadow-md shadow-pink-500 bg-pink-900/40 p-3 rounded-lg mt-8 items-center gap-4 relative'>
                 <Image src='/location.svg' width={15} height={15} alt='alt' />
-                <input className='bg-transparent w-full outline-none' type='text' placeholder='Pickup Location' value={source} onChange={(e) => { setSource(e.target.value); setSourceChange(true); }} />
+                <input className='bg-transparent w-full outline-none text-white placeholder:text-pink-200' type='text' placeholder='Pickup Location' value={source} onChange={(e) => { setSource(e.target.value); setSourceChange(true); }} />
             </div>
             {addressList?.suggestions && sourceChange ? (
                 <div className='shadow-md shadow-pink-500 p-1 rounded-lg absolute z-10 bg-black w-[535px]'>
@@ -94,7 +112,7 @@ function InputAddress() {
 
             <div className='flex shadow-md shadow-pink-500 bg-pink-900/40 p-3 rounded-lg mt-8 items-center gap-4'>
                 <Image src='/dest.svg' width={15} height={15} alt='alt' />
-                <input className='bg-transparent w-full outline-none' type='text' placeholder="Drop Off Location" value={destination} onChange={(e) => { setDestination(e.target.value); setDestinationChange(true); }} />
+                <input className='bg-transparent w-full outline-none text-white placeholder:text-pink-200' type='text' placeholder="Drop Off Location" value={destination} onChange={(e) => { setDestination(e.target.value); setDestinationChange(true); }} />
             </div>
             {addressList?.suggestions && destinationChange ? (
                 <div className='shadow-md shadow-pink-500 p-1 rounded-lg absolute z-10 bg-black w-[535px]'>
