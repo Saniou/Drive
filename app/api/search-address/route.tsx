@@ -30,7 +30,17 @@ export async function GET(request: Request) {
 
         params.set("session_token", sessionToken);
 
-        for (const key of new Set(Array.from(searchParams.keys()))) {
+        const uniqueKeys: string[] = [];
+        const seenKeys = new Set<string>();
+
+        for (const key of searchParams.keys()) {
+            if (!seenKeys.has(key)) {
+                seenKeys.add(key);
+                uniqueKeys.push(key);
+            }
+        }
+
+        for (const key of uniqueKeys) {
             if (key === "q" || key === "session_token") continue;
 
             const values = searchParams.getAll(key);
