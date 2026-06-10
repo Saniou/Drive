@@ -1,24 +1,48 @@
 'use client'
 
-import React, { useState } from 'react'
-import cardList from './data/CardList'
 import Image from 'next/image'
+import cardList from './data/CardList'
+import { useRide } from '@/context/RideContext'
+import type { PaymentMethod } from '@/lib/types'
 
-function Cards() {
-  const [ selectedCard, setSelectedCard ] = useState<any>()
+export default function Cards({ error }: { error?: string }) {
+  const { selectedPayment, setSelectedPayment } = useRide()
+
   return (
     <div>
-      <h2 className='mt-2 -mb-2 items-center justify-center flex font-medium'>Payment Methods</h2>
-      <div className=' grid grid-cols-5 mt-5 md:grid-cols-2 lg:grid-cols-5'>
-        {cardList.map((item: any, index: number) => (
-          <div className={`hover:bg-slate-800 w-[90px] flex rounded-lg cursor-pointer items-center hover:scale-110 justify-center text-center p-2 m-2 transition-all ${index === selectedCard ? 'border border-pink-900 bg-pink-900/40 ' : 'border border-white/20'} `} key={index} onClick={() => setSelectedCard(index)}>
-            <Image src={item.image} alt={item.name} width={80} height={80}
-              className={`items-center grayscale hover:grayscale-0 ${index === selectedCard ? 'grayscale-0' : null} transition-all`} />
-          </div>
-        ))}
+      <h2 className="-mb-2 mt-2 flex items-center justify-center font-medium">
+        Payment Methods
+      </h2>
+      <div className="mt-5 grid grid-cols-5 md:grid-cols-2 lg:grid-cols-5">
+        {cardList.map((card: PaymentMethod) => {
+          const isSelected = selectedPayment?.id === card.id
+          return (
+            <div
+              key={card.id}
+              onClick={() => setSelectedPayment(card)}
+              title={card.name}
+              className={`m-2 flex w-[90px] cursor-pointer items-center justify-center rounded-lg p-2 text-center transition-all hover:scale-110 hover:bg-slate-800 ${
+                isSelected
+                  ? 'border border-pink-900 bg-pink-900/40'
+                  : 'border border-white/20'
+              }`}
+            >
+              <Image
+                src={card.image}
+                alt={card.name}
+                width={80}
+                height={80}
+                className={`items-center transition-all hover:grayscale-0 ${
+                  isSelected ? 'grayscale-0' : 'grayscale'
+                }`}
+              />
+            </div>
+          )
+        })}
       </div>
+      {error && (
+        <p className="mt-1 pl-1 text-center text-xs text-red-400">{error}</p>
+      )}
     </div>
   )
 }
-
-export default Cards

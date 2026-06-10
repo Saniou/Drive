@@ -1,60 +1,47 @@
 'use client'
-import { Marker } from 'react-map-gl';
-import { UserLocationContext } from '@/context/UserLocationContext';
-import { useContext } from 'react';
-import Image from 'next/image';
+
+import { Marker } from 'react-map-gl'
+import Image from 'next/image'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { SourceCordiContext } from '@/context/SourceCoordiContext';
-import { DestinationCordiContext } from '@/context/DestinationCordiContext';
+import { useRide } from '@/context/RideContext'
 
-function Markers() {
+export default function Markers() {
+  const { userLocation, source, destination } = useRide()
 
-    const { userLocation, setUserLocation } = useContext(UserLocationContext)
+  return (
+    <>
+      {userLocation && (
+        <Marker
+          style={{ width: '40px' }}
+          longitude={userLocation.lng}
+          latitude={userLocation.lat}
+          anchor="bottom"
+        >
+          <Image width={30} height={30} src="/pin11.png" alt="Your location" />
+        </Marker>
+      )}
 
-    const { sourceCoordinates, setSourceCoordinates } = useContext(SourceCordiContext)
-    const { destinationsCoordinates, setDestinationsCoordinates } = useContext(DestinationCordiContext)
+      {source && (
+        <Marker
+          style={{ width: '40px' }}
+          longitude={source.lng}
+          latitude={source.lat}
+          anchor="bottom"
+        >
+          <Image width={30} height={30} src="/pin.png" alt="Pickup" />
+        </Marker>
+      )}
 
-    return (
-        <div>
-            <Marker
-                style={{ width: '40px' }}
-                longitude={userLocation?.lng}
-                latitude={userLocation?.lat}
-                anchor="bottom" >
-                <Image
-                    width={30}
-                    height={30}
-                    src="/pin11.png"
-                    alt='pin' />
-            </Marker>
-
-            {sourceCoordinates.length!=0 ?
-                <Marker
-                    style={{ width: '40px' }}
-                    longitude={sourceCoordinates?.lng}
-                    latitude={sourceCoordinates?.lat}
-                    anchor="bottom" >
-                    <Image
-                        width={30}
-                        height={30}
-                        src="/pin.png"
-                        alt='pin' />
-                </Marker> : null}
-
-                {destinationsCoordinates.length!=0 ?
-                <Marker
-                    style={{ width: '40px' }}
-                    longitude={destinationsCoordinates?.lng}
-                    latitude={destinationsCoordinates?.lat}
-                    anchor="bottom" >
-                    <Image
-                        width={30}
-                        height={30}
-                        src="/pin1.svg"
-                        alt='pin' />
-                </Marker> : null}
-        </div >
-    )
+      {destination && (
+        <Marker
+          style={{ width: '40px' }}
+          longitude={destination.lng}
+          latitude={destination.lat}
+          anchor="bottom"
+        >
+          <Image width={30} height={30} src="/pin1.svg" alt="Drop off" />
+        </Marker>
+      )}
+    </>
+  )
 }
-
-export default Markers

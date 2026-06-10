@@ -1,36 +1,54 @@
-"use client"
+'use client'
 
-import React, { useContext, useState } from 'react'
-import carList from './data/CarList'
 import Image from 'next/image'
-import { DirectionDataContext } from '@/context/DirectionDataContext'
+import carList from './data/CarList'
+import { useRide } from '@/context/RideContext'
+import type { Car } from '@/lib/types'
 
-function Cars() {
-  const [selectedCar, setSelectedCar] = useState<any>()
-  const { directionData, setDirectionData } = useContext(DirectionDataContext)
-  const getCost = (charges:any) => {
-    return (
-      (charges * directionData.routes[0].distance * 0.00062137).toFixed(0)
-    )
+const MILES_PER_METER = 0.00062137
+
+export default function Cars({ error }: { error?: string }) {
+  const { directionData, selectedCar, setSelectedCar } = useRide()
+
+  const distance = directionData?.routes?.[0]?.distance
+
+  const getCost = (charges: number) => {
+    if (distance === undefined) return null
+    return (charges * distance * MILES_PER_METER).toFixed(0)
   }
 
   return (
-    <div className='mt-8'>
-      <div className=' grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3'>
-        {carList.map((item: any, index: number) => (
-          <div className={`hover:bg-slate-800 rounded-lg cursor-pointer items-center justify-center text-center p-2 m-2 transition-all ${index === selectedCar ? 'border border-pink-900 bg-pink-900/40 ' : 'border border-white/20'} `} key={index} onClick={() => setSelectedCar(index)}>
-            <Image src={item.image} alt={item.name} width={150} height={100}
-              className={`w-full grayscale hover:grayscale-0 ${index === selectedCar ? 'grayscale-0' : null} transition-all`} />
-            <h2 className='text-[15px] mt-2'>{item.name}</h2>
-            {directionData.routes ? (
-              <span className='text-pink-500'>{getCost(item.charges)}$</span>
-            ) : null}
-
-          </div>
-        ))}
+    <div className="mt-8">
+      <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3">
+        {carList.map((car: Car) => {
+          const isSelected = selectedCar?.id === car.id
+          const cost = getCost(car.charges)
+          return (
+            <div
+              key={car.id}
+              onClick={() => setSelectedCar(car)}
+              className={`m-2 cursor-pointer items-center justify-center rounded-lg p-2 text-center transition-all hover:bg-slate-800 ${
+                isSelected
+                  ? 'border border-pink-900 bg-pink-900/40'
+                  : 'border border-white/20'
+              }`}
+            >
+              <Image
+                src={car.image}
+                alt={car.name}
+                width={150}
+                height={100}
+                className={`w-full transition-all hover:grayscale-0 ${
+                  isSelected ? 'grayscale-0' : 'grayscale'
+                }`}
+              />
+              <h2 className="mt-2 text-[15px]">{car.name}</h2>
+              {cost !== null && <span className="text-pink-500">{cost}$</span>}
+            </div>
+          )
+        })}
       </div>
+      {error && <p className="mt-1 pl-1 text-xs text-red-400">{error}</p>}
     </div>
   )
 }
-
-export default Cars

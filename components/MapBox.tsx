@@ -1,98 +1,70 @@
 'use client'
 
-import { Map } from 'react-map-gl';
-import { UserLocationContext } from '@/context/UserLocationContext';
-import { useContext, useEffect, useRef } from 'react';
+import { Map } from 'react-map-gl'
+import { useEffect, useRef } from 'react'
+import type { MapRef } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import Markers from './Markers';
-import { SourceCordiContext } from '@/context/SourceCoordiContext';
-import { DestinationCordiContext } from '@/context/DestinationCordiContext';
-import { DirectionDataContext } from '@/context/DirectionDataContext';
-import MapBoxRoute from './MapBoxRoute';
-import DistantTime from './DistantTime';
+import Markers from './Markers'
+import MapBoxRoute from './MapBoxRoute'
+import DistantTime from './DistantTime'
+import { useRide } from '@/context/RideContext'
+import { fetchDirections } from '@/lib/mapbox'
 
-const MAPBOX_DRIVING_ENDPOINT = "https://api.mapbox.com/directions/v5/mapbox/driving/";
-const session_token = "06675752-1b97-4391-88ba-e20ff3c0942c";
+const FLY_TO_OPTIONS = { duration: 2500, zoom: 12 } as const
 
-function MapBox() {
+export default function MapBox() {
+  const { userLocation, source, destination, directionData, setDirectionData } =
+    useRide()
 
-  const { sourceCoordinates, setSourceCoordinates } = useContext(SourceCordiContext)
-  const { destinationsCoordinates, setDestinationsCoordinates } = useContext(DestinationCordiContext)
-  const { directionData, setDirectionData } = useContext(DirectionDataContext)
-
-  const mapRef = useRef<any>()
-  const { userLocation, setUserLocation } = useContext(UserLocationContext)
+  const mapRef = useRef<MapRef>(null)
 
   useEffect(() => {
-    if (sourceCoordinates) {
-      mapRef.current?.flyTo({
-        center: [
-          sourceCoordinates.lng,
-          sourceCoordinates.lat
-        ],
-        duration: 2500,
-        zoom: 12
-      })
+    if (source) {
+      mapRef.current?.flyTo({ center: [source.lng, source.lat], ...FLY_TO_OPTIONS })
     }
-  }, [sourceCoordinates])
+  }, [source])
 
   useEffect(() => {
-    if (destinationsCoordinates) {
+    if (destination) {
       mapRef.current?.flyTo({
-        center: [
-          destinationsCoordinates.lng,
-          destinationsCoordinates.lat
-        ],
-        duration: 2500,
-        zoom: 12
+        center: [destination.lng, destination.lat],
+        ...FLY_TO_OPTIONS,
       })
     }
 
-    if (sourceCoordinates && destinationsCoordinates) {
-      getDirectionRoute()
+    if (source && destination) {
+      fetchDirections(source, destination).then(setDirectionData)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [destination])
 
-  }, [destinationsCoordinates])
-
-  const getDirectionRoute = async () => {
-    const res = await fetch(MAPBOX_DRIVING_ENDPOINT + sourceCoordinates.lng + ',' + sourceCoordinates.lat + ';' + destinationsCoordinates.lng + ',' + destinationsCoordinates.lat + '?overview=full&geometries=geojson' + '&access_token=' + process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN, {
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }
-    );
-    const result = await res.json()
-    console.log(result)
-    setDirectionData(result)
-  }
+  if (!userLocation) return null
 
   return (
     <>
-      <div className='rounded-lg overflow-hidden'>
-        {userLocation ?
-          <Map
-            ref={mapRef}
-            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-            initialViewState={{
-              longitude: userLocation?.lng,
-              latitude: userLocation?.lat,
-              zoom: 14
-            }}
-            style={{ width: '100%', height: 800, borderRadius: 10 }}
-            mapStyle="mapbox://styles/sanio/closwhh3200tj01qmgdi0f3uu"
-          >
-
-            <Markers />
-            {directionData?.routes ? (
-              <MapBoxRoute coordinates={directionData?.routes[0]?.geometry?.coordinates} />
-            ) : null}
-          </Map> : null}
+      <div className="overflow-hidden rounded-lg">
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+          initialViewState={{
+            longitude: userLocation.lng,
+            latitude: userLocation.lat,
+            zoom: 14,
+          }}
+          style={{ width: '100%', height: 800, borderRadius: 10 }}
+          mapStyle="mapbox://styles/sanio/closwhh3200tj01qmgdi0f3uu"
+        >
+          <Markers />
+          {directionData?.routes?.[0] && (
+            <MapBoxRoute
+              coordinates={directionData.routes[0].geometry.coordinates}
+            />
+          )}
+        </Map>
       </div>
-      <div className='absolute bottom-[40px] z-20 right-[20px] hidden md:block'>
+      <div className="absolute bottom-[40px] right-[20px] z-20 hidden md:block">
         <DistantTime />
       </div>
     </>
-  );
+  )
 }
-
-export default MapBox
