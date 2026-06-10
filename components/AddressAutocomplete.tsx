@@ -168,7 +168,7 @@ export default function AddressAutocomplete({
                     : 'border-transparent'
                 }`}
               >
-                <span className="mt-0.5 text-brand-400/70">📍</span>
+                <span className="mt-0.5 grayscale">📍</span>
                 <span className="min-w-0">
                   <span
                     className={`block truncate text-sm font-medium ${

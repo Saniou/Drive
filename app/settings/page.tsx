@@ -32,7 +32,7 @@ function SavedRow({
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="flex items-center gap-2 font-semibold">
-          <span className="text-lg">{icon}</span> {title}
+          <span className="text-lg grayscale">{icon}</span> {title}
         </h3>
         {place && (
           <button

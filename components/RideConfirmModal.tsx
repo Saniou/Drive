@@ -53,7 +53,7 @@ export default function RideConfirmModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3">
-          <span className="text-3xl">{isPackage ? '📦' : '🚗'}</span>
+          <span className="text-3xl grayscale">{isPackage ? '📦' : '🚗'}</span>
           <div>
             <h2 className="text-xl font-bold">
               {isPackage ? 'Courier booked!' : 'Ride booked!'}

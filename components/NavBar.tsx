@@ -76,7 +76,7 @@ function NavBar() {
                     className="transition-transform group-hover:scale-110"
                   />
                 ) : (
-                  <span className="text-base transition-transform group-hover:scale-110">
+                  <span className="text-base grayscale transition-transform group-hover:scale-110">
                     {menu.emoji}
                   </span>
                 )}

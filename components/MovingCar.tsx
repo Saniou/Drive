@@ -47,7 +47,7 @@ export default function MovingCar({
 
   return (
     <Marker longitude={pos[0]} latitude={pos[1]} anchor="center">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-base shadow-[0_0_16px_rgba(236,72,153,0.95)]">
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-base grayscale shadow-[0_0_16px_rgba(236,72,153,0.95)]">
         🚗
       </div>
     </Marker>

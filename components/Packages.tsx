@@ -38,7 +38,7 @@ export default function Packages({ selected, onSelect }: PackagesProps) {
                 isSelected ? 'tile-active' : ''
               }`}
             >
-              <div className="text-3xl">{tier.emoji}</div>
+              <div className="text-3xl grayscale">{tier.emoji}</div>
               <h3 className="mt-1 text-[13px] font-medium text-white">
                 {tier.name}
               </h3>

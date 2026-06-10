@@ -38,7 +38,7 @@ export default function SavedPlaces({
           title={chip.place.label}
           className="flex max-w-[180px] items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/70 transition-all hover:border-brand-500/50 hover:text-white"
         >
-          <span>{chip.icon}</span>
+          <span className="grayscale">{chip.icon}</span>
           <span className="truncate">{chip.text}</span>
         </button>
       ))}

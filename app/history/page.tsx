@@ -31,7 +31,7 @@ export default async function HistoryPage() {
 
         {rides.length === 0 ? (
           <div className="glass mt-8 flex flex-col items-center gap-3 rounded-3xl p-12 text-center">
-            <span className="text-4xl">🛣️</span>
+            <span className="text-4xl grayscale">🛣️</span>
             <p className="text-white/60">No trips yet.</p>
             <Link href="/" className="btn-brand px-6 py-2.5 text-sm">
               Book your first ride
@@ -46,7 +46,7 @@ export default async function HistoryPage() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2 text-sm font-semibold">
-                    <span className="text-lg">
+                    <span className="text-lg grayscale">
                       {ride.type === 'package' ? '📦' : '🚗'}
                     </span>
                     {ride.optionName}
