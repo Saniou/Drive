@@ -11,8 +11,6 @@ interface AddressAutocompleteProps {
   /** Fired with coordinates when a suggestion is picked, or null when the
    * field no longer holds a confirmed address (e.g. the user edits the text). */
   onChange: (coords: Coordinates | null, label: string) => void
-  /** Validation message shown beneath the field (set by the parent on submit). */
-  error?: string
 }
 
 const MIN_QUERY_LENGTH = 2
@@ -22,7 +20,6 @@ export default function AddressAutocomplete({
   icon,
   placeholder,
   onChange,
-  error,
 }: AddressAutocompleteProps) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
@@ -120,11 +117,7 @@ export default function AddressAutocomplete({
 
   return (
     <div ref={containerRef} className="relative mt-8">
-      <div
-        className={`flex items-center gap-4 rounded-lg bg-pink-900/40 p-3 shadow-md transition-shadow ${
-          error ? 'shadow-red-500' : 'shadow-pink-500'
-        }`}
-      >
+      <div className="flex items-center gap-4 rounded-lg bg-pink-900/40 p-3 shadow-md shadow-pink-500">
         <Image src={icon} width={15} height={15} alt="" />
         <input
           className="w-full bg-transparent text-white outline-none placeholder:text-pink-200"
@@ -179,8 +172,6 @@ export default function AddressAutocomplete({
           )}
         </div>
       )}
-
-      {error && <p className="mt-1 pl-1 text-xs text-red-400">{error}</p>}
     </div>
   )
 }

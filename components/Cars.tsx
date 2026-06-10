@@ -7,7 +7,7 @@ import type { Car } from '@/lib/types'
 
 const MILES_PER_METER = 0.00062137
 
-export default function Cars({ error }: { error?: string }) {
+export default function Cars() {
   const { directionData, selectedCar, setSelectedCar } = useRide()
 
   const distance = directionData?.routes?.[0]?.distance
@@ -48,7 +48,6 @@ export default function Cars({ error }: { error?: string }) {
           )
         })}
       </div>
-      {error && <p className="mt-1 pl-1 text-xs text-red-400">{error}</p>}
     </div>
   )
 }

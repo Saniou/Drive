@@ -5,7 +5,7 @@ import cardList from './data/CardList'
 import { useRide } from '@/context/RideContext'
 import type { PaymentMethod } from '@/lib/types'
 
-export default function Cards({ error }: { error?: string }) {
+export default function Cards() {
   const { selectedPayment, setSelectedPayment } = useRide()
 
   return (
@@ -40,9 +40,6 @@ export default function Cards({ error }: { error?: string }) {
           )
         })}
       </div>
-      {error && (
-        <p className="mt-1 pl-1 text-center text-xs text-red-400">{error}</p>
-      )}
     </div>
   )
 }

@@ -1,17 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import toast from 'react-hot-toast'
 import AddressAutocomplete from './AddressAutocomplete'
 import Cars from './Cars'
 import Cards from './Cards'
 import { useRide } from '@/context/RideContext'
-
-interface FormErrors {
-  pickup?: string
-  dropoff?: string
-  car?: string
-  payment?: string
-}
 
 export default function SearchInput() {
   const {
@@ -23,22 +16,19 @@ export default function SearchInput() {
     selectedPayment,
   } = useRide()
 
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [confirmed, setConfirmed] = useState(false)
-
-  const validate = (): FormErrors => {
-    const next: FormErrors = {}
-    if (!source) next.pickup = 'Choose a pickup location from the list'
-    if (!destination) next.dropoff = 'Choose a drop off location from the list'
-    if (!selectedCar) next.car = 'Select a car'
-    if (!selectedPayment) next.payment = 'Select a payment method'
-    return next
-  }
-
   const handleSubmit = () => {
-    const next = validate()
-    setErrors(next)
-    setConfirmed(Object.keys(next).length === 0)
+    const missing: string[] = []
+    if (!source) missing.push('pickup location')
+    if (!destination) missing.push('drop off location')
+    if (!selectedCar) missing.push('a car')
+    if (!selectedPayment) missing.push('a payment method')
+
+    if (missing.length > 0) {
+      toast.error(`Please choose ${missing.join(', ')}.`)
+      return
+    }
+
+    toast.success(`Ride requested! Your ${selectedCar?.name} is on the way 🚗`)
   }
 
   return (
@@ -48,27 +38,17 @@ export default function SearchInput() {
       <AddressAutocomplete
         icon="/location.svg"
         placeholder="Pickup Location"
-        error={errors.pickup}
-        onChange={(coords) => {
-          setSource(coords)
-          if (coords) setErrors((e) => ({ ...e, pickup: undefined }))
-          setConfirmed(false)
-        }}
+        onChange={(coords) => setSource(coords)}
       />
 
       <AddressAutocomplete
         icon="/dest.svg"
         placeholder="Drop Off Location"
-        error={errors.dropoff}
-        onChange={(coords) => {
-          setDestination(coords)
-          if (coords) setErrors((e) => ({ ...e, dropoff: undefined }))
-          setConfirmed(false)
-        }}
+        onChange={(coords) => setDestination(coords)}
       />
 
-      <Cars error={errors.car} />
-      <Cards error={errors.payment} />
+      <Cars />
+      <Cards />
 
       <button
         type="button"
@@ -77,12 +57,6 @@ export default function SearchInput() {
       >
         I&apos;m drive!
       </button>
-
-      {confirmed && (
-        <p className="mt-3 text-center text-sm text-green-400">
-          Ride requested! Your {selectedCar?.name} is on the way 🚗
-        </p>
-      )}
     </div>
   )
 }
