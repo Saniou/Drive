@@ -116,11 +116,11 @@ export default function AddressAutocomplete({
   }
 
   return (
-    <div ref={containerRef} className="relative mt-8">
-      <div className="flex items-center gap-4 rounded-lg bg-pink-900/40 p-3 shadow-md shadow-pink-500">
-        <Image src={icon} width={15} height={15} alt="" />
+    <div ref={containerRef} className="relative mt-4">
+      <div className="glass-input flex items-center gap-3 rounded-2xl px-4 py-3.5">
+        <Image src={icon} width={16} height={16} alt="" className="opacity-80" />
         <input
-          className="w-full bg-transparent text-white outline-none placeholder:text-pink-200"
+          className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"
           type="text"
           placeholder={placeholder}
           value={query}
@@ -131,14 +131,14 @@ export default function AddressAutocomplete({
         />
         {loading && (
           <span
-            className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-pink-300 border-t-transparent"
+            className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-brand-400 border-t-transparent"
             aria-label="Loading"
           />
         )}
       </div>
 
       {open && (
-        <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg bg-black shadow-md shadow-pink-500">
+        <div className="absolute z-40 mt-2 max-h-72 w-full overflow-y-auto rounded-2xl border border-white/10 bg-[#120f18] shadow-glow-lg">
           {suggestions.length > 0 ? (
             suggestions.map((item, index) => (
               <button
@@ -147,26 +147,31 @@ export default function AddressAutocomplete({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSelect(item)}
                 onMouseEnter={() => setActiveIndex(index)}
-                className={`block w-full cursor-pointer px-3 py-2.5 text-left transition-colors ${
-                  index === activeIndex ? 'bg-slate-700' : ''
+                className={`flex w-full items-start gap-3 border-l-2 px-4 py-3 text-left transition-colors ${
+                  index === activeIndex
+                    ? 'border-brand-500 bg-brand-500/10'
+                    : 'border-transparent'
                 }`}
               >
-                <span
-                  className={`block truncate text-sm font-medium ${
-                    index === activeIndex ? 'text-pink-400' : 'text-white'
-                  }`}
-                >
-                  {item.name}
-                </span>
-                {item.place_formatted && (
-                  <span className="block truncate text-xs text-pink-200/60">
-                    {item.place_formatted}
+                <span className="mt-0.5 text-brand-400/70">📍</span>
+                <span className="min-w-0">
+                  <span
+                    className={`block truncate text-sm font-medium ${
+                      index === activeIndex ? 'text-brand-400' : 'text-white'
+                    }`}
+                  >
+                    {item.name}
                   </span>
-                )}
+                  {item.place_formatted && (
+                    <span className="block truncate text-xs text-white/40">
+                      {item.place_formatted}
+                    </span>
+                  )}
+                </span>
               </button>
             ))
           ) : (
-            <p className="px-3 py-3 text-sm text-pink-200/70">
+            <p className="px-4 py-4 text-sm text-white/50">
               {loading ? 'Searching…' : 'No matching places found'}
             </p>
           )}

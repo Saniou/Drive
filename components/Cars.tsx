@@ -18,19 +18,21 @@ export default function Cars() {
   }
 
   return (
-    <div className="mt-8">
-      <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-6">
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+        Choose a car
+      </h2>
+      <div className="grid grid-cols-3 gap-2.5">
         {carList.map((car: Car) => {
           const isSelected = selectedCar?.id === car.id
           const cost = getCost(car.charges)
           return (
-            <div
+            <button
               key={car.id}
+              type="button"
               onClick={() => setSelectedCar(car)}
-              className={`m-2 cursor-pointer items-center justify-center rounded-lg p-2 text-center transition-all hover:bg-slate-800 ${
-                isSelected
-                  ? 'border border-pink-900 bg-pink-900/40'
-                  : 'border border-white/20'
+              className={`tile group p-2.5 text-center ${
+                isSelected ? 'tile-active' : ''
               }`}
             >
               <Image
@@ -38,13 +40,19 @@ export default function Cars() {
                 alt={car.name}
                 width={150}
                 height={100}
-                className={`w-full transition-all hover:grayscale-0 ${
+                className={`mx-auto h-16 w-auto object-contain transition-all duration-300 group-hover:grayscale-0 ${
                   isSelected ? 'grayscale-0' : 'grayscale'
                 }`}
               />
-              <h2 className="mt-2 text-[15px]">{car.name}</h2>
-              {cost !== null && <span className="text-pink-500">{cost}$</span>}
-            </div>
+              <h3 className="mt-1.5 text-[13px] font-medium text-white">
+                {car.name}
+              </h3>
+              {cost !== null && (
+                <span className="text-sm font-semibold text-brand-400">
+                  {cost}$
+                </span>
+              )}
+            </button>
           )
         })}
       </div>

@@ -9,34 +9,33 @@ export default function Cards() {
   const { selectedPayment, setSelectedPayment } = useRide()
 
   return (
-    <div>
-      <h2 className="-mb-2 mt-2 flex items-center justify-center font-medium">
-        Payment Methods
+    <div className="mt-6">
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+        Payment method
       </h2>
-      <div className="mt-5 grid grid-cols-5 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-5 gap-2">
         {cardList.map((card: PaymentMethod) => {
           const isSelected = selectedPayment?.id === card.id
           return (
-            <div
+            <button
               key={card.id}
+              type="button"
               onClick={() => setSelectedPayment(card)}
               title={card.name}
-              className={`m-2 flex w-[90px] cursor-pointer items-center justify-center rounded-lg p-2 text-center transition-all hover:scale-110 hover:bg-slate-800 ${
-                isSelected
-                  ? 'border border-pink-900 bg-pink-900/40'
-                  : 'border border-white/20'
+              className={`tile group flex h-20 items-center justify-center p-3 hover:scale-[1.04] ${
+                isSelected ? 'tile-active' : ''
               }`}
             >
               <Image
                 src={card.image}
                 alt={card.name}
-                width={80}
-                height={80}
-                className={`items-center transition-all hover:grayscale-0 ${
+                width={64}
+                height={64}
+                className={`h-9 w-auto max-w-[75%] object-contain transition-all duration-300 group-hover:grayscale-0 ${
                   isSelected ? 'grayscale-0' : 'grayscale'
                 }`}
               />
-            </div>
+            </button>
           )
         })}
       </div>

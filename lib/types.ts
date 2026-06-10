@@ -29,6 +29,15 @@ export interface PaymentMethod {
   image: string
 }
 
+export interface PackageTier {
+  id: number
+  name: string
+  emoji: string
+  /** Price multiplier per mile. */
+  charges: number
+  hint: string
+}
+
 export interface DirectionRoute {
   distance: number
   duration: number

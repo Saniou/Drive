@@ -11,17 +11,26 @@ export default function DistantTime() {
   if (!route) return null
 
   return (
-    <div className="bg-black p-5">
-      <h2 className="text-[15px] opacity-80">
-        Distance:{' '}
-        <span className="mr-3 font-bold text-pink-500">
-          {(route.distance * MILES_PER_METER).toFixed(2)} Miles
-        </span>
-        Duration:{' '}
-        <span className="mr-3 font-bold text-pink-500">
-          {(route.duration / 60).toFixed(2)} Min
-        </span>
-      </h2>
+    <div className="glass flex items-center gap-5 rounded-2xl px-5 py-3 shadow-glow">
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-white/40">
+          Distance
+        </p>
+        <p className="text-lg font-bold text-brand-400">
+          {(route.distance * MILES_PER_METER).toFixed(1)}
+          <span className="ml-1 text-xs font-normal text-white/50">mi</span>
+        </p>
+      </div>
+      <div className="h-8 w-px bg-white/10" />
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-white/40">
+          Duration
+        </p>
+        <p className="text-lg font-bold text-brand-400">
+          {(route.duration / 60).toFixed(0)}
+          <span className="ml-1 text-xs font-normal text-white/50">min</span>
+        </p>
+      </div>
     </div>
   )
 }
