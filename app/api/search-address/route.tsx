@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+// Must run per-request: it depends on the `q` query param. Without this Next
+// statically optimizes the GET handler and caches an empty build-time result.
+export const dynamic = "force-dynamic";
+
 const BASE_URL = "https://api.mapbox.com/search/searchbox/v1/suggest";
 // Both env vars hold the same public `pk.` token. Prefer the NEXT_PUBLIC one —
 // it's the token proven to work on this domain (the map renders with it), and
