@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
 const BASE_URL = "https://api.mapbox.com/search/searchbox/v1/suggest";
-// Mapbox token is a public `pk.` token — fall back to the NEXT_PUBLIC one so the
-// search works even if only the public env var is configured on the host.
+// Both env vars hold the same public `pk.` token. Prefer the NEXT_PUBLIC one —
+// it's the token proven to work on this domain (the map renders with it), and
+// it's inlined at build time, so it can't be a misconfigured runtime value.
 const ACCESS_TOKEN =
-    process.env.MAPBOX_ACCESS_TOKEN ||
     process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+    process.env.MAPBOX_ACCESS_TOKEN ||
     "";
 const FALLBACK_SESSION = "06675752-1b97-4391-88ba-e20ff3c0942c";
 
@@ -16,10 +17,16 @@ export async function GET(request: Request) {
 
         const q = (sp.get("q") || "").trim();
         const sessionToken = sp.get("session_token") || FALLBACK_SESSION;
+        const debug = sp.get("debug") === "1";
 
         // мʼякі валідації, щоб уникати 422
         if (!ACCESS_TOKEN || q.length < 2) {
-            return NextResponse.json({ suggestions: [] }, { status: 200 });
+            return NextResponse.json(
+                debug
+                    ? { suggestions: [], _debug: { tokenPresent: !!ACCESS_TOKEN, reason: "no-token-or-short-query", qLen: q.length } }
+                    : { suggestions: [] },
+                { status: 200 }
+            );
         }
         if (/^\d+$/.test(q) && q.length < 3) {
             return NextResponse.json({ suggestions: [] }, { status: 200 });
@@ -51,7 +58,16 @@ export async function GET(request: Request) {
 
         if (!res.ok) {
             // 4xx (в т.ч. 422) — тихо повертаємо порожній список
-            return NextResponse.json({ suggestions: [] }, { status: 200 });
+            let body = "";
+            if (debug) {
+                try { body = (await res.text()).slice(0, 200); } catch {}
+            }
+            return NextResponse.json(
+                debug
+                    ? { suggestions: [], _debug: { tokenPresent: true, mapboxStatus: res.status, mapboxBody: body } }
+                    : { suggestions: [] },
+                { status: 200 }
+            );
         }
 
         const data = await res.json();
