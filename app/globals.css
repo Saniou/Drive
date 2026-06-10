@@ -56,6 +56,19 @@ body {
   }
 }
 
+/* Indeterminate progress bar for the preloader */
+@keyframes loader-slide {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+.loader-bar {
+  animation: loader-slide 1.1s ease-in-out infinite;
+}
+
 /* Custom themed scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

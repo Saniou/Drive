@@ -38,10 +38,15 @@ const config: Config = {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        'loader-slide': {
+          '0%': { transform: 'translateX(-120%)' },
+          '100%': { transform: 'translateX(260%)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out both',
-        shimmer: 'shimmer 1.5s infinite',
+        shimmer: 'shimmer 1.6s infinite',
+        'loader-slide': 'loader-slide 1.1s ease-in-out infinite',
       },
     },
   },

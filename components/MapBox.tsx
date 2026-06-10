@@ -1,12 +1,13 @@
 'use client'
 
 import { Map } from 'react-map-gl'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MapRef } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Markers from './Markers'
 import MapBoxRoute from './MapBoxRoute'
 import DistantTime from './DistantTime'
+import MapSkeleton from './MapSkeleton'
 import { useRide } from '@/context/RideContext'
 import { fetchDirections } from '@/lib/mapbox'
 
@@ -18,6 +19,7 @@ export default function MapBox() {
 
   const mapRef = useRef<MapRef>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   // Mapbox doesn't repaint when only its container resizes (e.g. dragging the
   // split divider), leaving a blank gap. Resize the map on any container change.
@@ -61,31 +63,37 @@ export default function MapBox() {
     )
   }, [source, destination, setDirectionData])
 
-  if (!userLocation) return null
-
   return (
     <div
       ref={containerRef}
       className="relative h-[60vh] overflow-hidden rounded-3xl border border-white/10 shadow-glow ring-1 ring-brand-500/20 md:h-[calc(100vh-7.5rem)]"
     >
-      <Map
-        ref={mapRef}
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        initialViewState={{
-          longitude: userLocation.lng,
-          latitude: userLocation.lat,
-          zoom: 14,
-        }}
-        style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/sanio/closwhh3200tj01qmgdi0f3uu"
-      >
-        <Markers />
-        {directionData?.routes?.[0] && (
-          <MapBoxRoute
-            coordinates={directionData.routes[0].geometry.coordinates}
-          />
-        )}
-      </Map>
+      {userLocation && (
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+          initialViewState={{
+            longitude: userLocation.lng,
+            latitude: userLocation.lat,
+            zoom: 14,
+          }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle="mapbox://styles/sanio/closwhh3200tj01qmgdi0f3uu"
+          onLoad={() => setMapLoaded(true)}
+        >
+          <Markers />
+          {directionData?.routes?.[0] && (
+            <MapBoxRoute
+              coordinates={directionData.routes[0].geometry.coordinates}
+            />
+          )}
+        </Map>
+      )}
+
+      {(!userLocation || !mapLoaded) && (
+        <MapSkeleton label={userLocation ? 'Loading map…' : 'Locating you…'} />
+      )}
+
       <div className="absolute bottom-5 right-5 z-20">
         <DistantTime />
       </div>

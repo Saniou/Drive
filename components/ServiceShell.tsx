@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import NavBar from './NavBar'
 import MapBox from './MapBox'
 import SplitPane from './SplitPane'
+import Preloader from './Preloader'
 import { RideProvider, useRide } from '@/context/RideContext'
 
 function ShellInner({ children }: { children: ReactNode }) {
@@ -25,6 +26,7 @@ function ShellInner({ children }: { children: ReactNode }) {
 
   return (
     <>
+      <Preloader />
       <Toaster
         position="top-center"
         toastOptions={{
