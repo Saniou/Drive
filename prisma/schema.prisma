@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Ride {
+  id            String   @id @default(cuid())
+  userId        String // Clerk user id
+
+  type          String // "ride" | "package"
+
+  pickupLabel   String
+  pickupLng     Float
+  pickupLat     Float
+
+  dropoffLabel  String
+  dropoffLng    Float
+  dropoffLat    Float
+
+  optionName    String // selected car name or package tier
+  paymentName   String
+
+  distance      Float // meters
+  duration      Float // seconds
+  price         Float // dollars
+
+  createdAt     DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

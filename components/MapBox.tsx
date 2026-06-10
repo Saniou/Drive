@@ -6,6 +6,7 @@ import type { MapRef } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import Markers from './Markers'
 import MapBoxRoute from './MapBoxRoute'
+import MovingCar from './MovingCar'
 import DistantTime from './DistantTime'
 import MapSkeleton from './MapSkeleton'
 import { useRide } from '@/context/RideContext'
@@ -83,9 +84,14 @@ export default function MapBox() {
         >
           <Markers />
           {directionData?.routes?.[0] && (
-            <MapBoxRoute
-              coordinates={directionData.routes[0].geometry.coordinates}
-            />
+            <>
+              <MapBoxRoute
+                coordinates={directionData.routes[0].geometry.coordinates}
+              />
+              <MovingCar
+                coordinates={directionData.routes[0].geometry.coordinates}
+              />
+            </>
           )}
         </Map>
       )}

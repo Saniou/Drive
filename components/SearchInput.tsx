@@ -1,11 +1,19 @@
 'use client'
 
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import AddressAutocomplete from './AddressAutocomplete'
+import SavedPlaces from './SavedPlaces'
 import Cars from './Cars'
 import Cards from './Cards'
+import RideConfirmModal from './RideConfirmModal'
+import type { RideSummary } from './RideConfirmModal'
 import { useRide } from '@/context/RideContext'
 import { useReveal } from '@/lib/useReveal'
+import { addRecent } from '@/lib/savedPlaces'
+import type { Coordinates } from '@/lib/types'
+
+const MILES_PER_METER = 0.00062137
 
 export default function SearchInput() {
   const {
@@ -13,13 +21,27 @@ export default function SearchInput() {
     setDestination,
     source,
     destination,
+    directionData,
     selectedCar,
     selectedPayment,
   } = useRide()
 
+  const [pickupLabel, setPickupLabel] = useState('')
+  const [dropoffLabel, setDropoffLabel] = useState('')
+  const [injectPickup, setInjectPickup] = useState<{
+    label: string
+    coords: Coordinates
+  } | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [confirmed, setConfirmed] = useState<RideSummary | null>(null)
+
   const scope = useReveal<HTMLDivElement>()
 
-  const handleSubmit = () => {
+  const remember = (coords: Coordinates, label: string) => {
+    addRecent({ label, lng: coords.lng, lat: coords.lat })
+  }
+
+  const handleSubmit = async () => {
     const missing: string[] = []
     if (!source) missing.push('pickup location')
     if (!destination) missing.push('drop off location')
@@ -31,7 +53,43 @@ export default function SearchInput() {
       return
     }
 
-    toast.success(`Ride requested! Your ${selectedCar?.name} is on the way 🚗`)
+    const distance = directionData?.routes?.[0]?.distance ?? 0
+    const duration = directionData?.routes?.[0]?.duration ?? 0
+    const price = Number(
+      (selectedCar!.charges * distance * MILES_PER_METER).toFixed(0)
+    )
+
+    const summary: RideSummary = {
+      type: 'ride',
+      optionName: selectedCar!.name,
+      paymentName: selectedPayment!.name,
+      pickupLabel,
+      dropoffLabel,
+      distance,
+      duration,
+      price,
+    }
+
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/rides', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...summary,
+          pickupLng: source!.lng,
+          pickupLat: source!.lat,
+          dropoffLng: destination!.lng,
+          dropoffLat: destination!.lat,
+        }),
+      })
+      if (!res.ok) throw new Error('save failed')
+      setConfirmed(summary)
+    } catch {
+      toast.error('Could not book the ride. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -49,7 +107,19 @@ export default function SearchInput() {
         <AddressAutocomplete
           icon="/location.svg"
           placeholder="Pickup Location"
-          onChange={(coords) => setSource(coords)}
+          inject={injectPickup}
+          onChange={(coords, label) => {
+            setSource(coords)
+            if (coords) {
+              setPickupLabel(label)
+              remember(coords, label)
+            }
+          }}
+        />
+        <SavedPlaces
+          onPick={(p) =>
+            setInjectPickup({ label: p.label, coords: { lng: p.lng, lat: p.lat } })
+          }
         />
       </div>
 
@@ -57,7 +127,13 @@ export default function SearchInput() {
         <AddressAutocomplete
           icon="/dest.svg"
           placeholder="Drop Off Location"
-          onChange={(coords) => setDestination(coords)}
+          onChange={(coords, label) => {
+            setDestination(coords)
+            if (coords) {
+              setDropoffLabel(label)
+              remember(coords, label)
+            }
+          }}
         />
       </div>
 
@@ -73,10 +149,13 @@ export default function SearchInput() {
         data-reveal
         type="button"
         onClick={handleSubmit}
-        className="btn-brand mt-8 w-full py-3.5 text-base"
+        disabled={submitting}
+        className="btn-brand mt-8 w-full py-3.5 text-base disabled:opacity-60"
       >
-        I&apos;m drive!
+        {submitting ? 'Booking…' : "I'm drive!"}
       </button>
+
+      <RideConfirmModal ride={confirmed} onClose={() => setConfirmed(null)} />
     </div>
   )
 }

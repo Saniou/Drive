@@ -11,6 +11,9 @@ interface AddressAutocompleteProps {
   /** Fired with coordinates when a suggestion is picked, or null when the
    * field no longer holds a confirmed address (e.g. the user edits the text). */
   onChange: (coords: Coordinates | null, label: string) => void
+  /** Externally set value (e.g. picking a saved place). Pass a NEW object each
+   * time to re-apply; the field fills in and reports the coordinates. */
+  inject?: { label: string; coords: Coordinates } | null
 }
 
 const MIN_QUERY_LENGTH = 2
@@ -20,6 +23,7 @@ export default function AddressAutocomplete({
   icon,
   placeholder,
   onChange,
+  inject,
 }: AddressAutocompleteProps) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
@@ -30,6 +34,17 @@ export default function AddressAutocomplete({
   const [confirmed, setConfirmed] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Apply an externally injected place (saved place / quick pick).
+  useEffect(() => {
+    if (!inject) return
+    setQuery(inject.label)
+    setConfirmed(true)
+    setOpen(false)
+    setSuggestions([])
+    onChange(inject.coords, inject.label)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inject])
 
   // Debounced suggestion fetch.
   useEffect(() => {

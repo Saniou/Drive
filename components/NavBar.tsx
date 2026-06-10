@@ -9,8 +9,10 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
 const headerMenu = [
-  { id: 1, name: 'Ride', icon: '/driver.svg', href: '/' },
-  { id: 2, name: 'Package', icon: '/package.svg', href: '/package' },
+  { id: 1, name: 'Ride', icon: '/driver.svg', emoji: null, href: '/' },
+  { id: 2, name: 'Package', icon: '/package.svg', emoji: null, href: '/package' },
+  { id: 3, name: 'History', icon: null, emoji: '🕐', href: '/history' },
+  { id: 4, name: 'Settings', icon: null, emoji: '⚙️', href: '/settings' },
 ]
 
 function NavBar() {
@@ -65,13 +67,19 @@ function NavBar() {
                     : 'text-white/70 hover:bg-white/5 hover:text-white'
                 }`}
               >
-                <Image
-                  src={menu.icon}
-                  width={22}
-                  height={18}
-                  alt=""
-                  className="transition-transform group-hover:scale-110"
-                />
+                {menu.icon ? (
+                  <Image
+                    src={menu.icon}
+                    width={22}
+                    height={18}
+                    alt=""
+                    className="transition-transform group-hover:scale-110"
+                  />
+                ) : (
+                  <span className="text-base transition-transform group-hover:scale-110">
+                    {menu.emoji}
+                  </span>
+                )}
                 <span>{menu.name}</span>
               </Link>
             )
