@@ -3,8 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Pooled connection (e.g. Neon/Supabase pgbouncer) used by the app at runtime.
+  url       = env("DATABASE_URL")
+  // Direct connection used for migrations (`prisma migrate deploy`).
+  directUrl = env("DIRECT_URL")
 }
 
 model Ride {

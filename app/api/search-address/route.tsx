@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 const BASE_URL = "https://api.mapbox.com/search/searchbox/v1/suggest";
-const ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN!;
+// Mapbox token is a public `pk.` token — fall back to the NEXT_PUBLIC one so the
+// search works even if only the public env var is configured on the host.
+const ACCESS_TOKEN =
+    process.env.MAPBOX_ACCESS_TOKEN ||
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+    "";
 const FALLBACK_SESSION = "06675752-1b97-4391-88ba-e20ff3c0942c";
 
 export async function GET(request: Request) {
