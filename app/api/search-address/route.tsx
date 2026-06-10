@@ -21,16 +21,10 @@ export async function GET(request: Request) {
 
         const q = (sp.get("q") || "").trim();
         const sessionToken = sp.get("session_token") || FALLBACK_SESSION;
-        const debug = sp.get("debug") === "1";
 
         // мʼякі валідації, щоб уникати 422
         if (!ACCESS_TOKEN || q.length < 2) {
-            return NextResponse.json(
-                debug
-                    ? { suggestions: [], _debug: { tokenPresent: !!ACCESS_TOKEN, reason: "no-token-or-short-query", qLen: q.length } }
-                    : { suggestions: [] },
-                { status: 200 }
-            );
+            return NextResponse.json({ suggestions: [] }, { status: 200 });
         }
         if (/^\d+$/.test(q) && q.length < 3) {
             return NextResponse.json({ suggestions: [] }, { status: 200 });
@@ -62,16 +56,7 @@ export async function GET(request: Request) {
 
         if (!res.ok) {
             // 4xx (в т.ч. 422) — тихо повертаємо порожній список
-            let body = "";
-            if (debug) {
-                try { body = (await res.text()).slice(0, 200); } catch {}
-            }
-            return NextResponse.json(
-                debug
-                    ? { suggestions: [], _debug: { tokenPresent: true, mapboxStatus: res.status, mapboxBody: body } }
-                    : { suggestions: [] },
-                { status: 200 }
-            );
+            return NextResponse.json({ suggestions: [] }, { status: 200 });
         }
 
         const data = await res.json();
